@@ -4,7 +4,7 @@ def random():
     return nx.random_geometric_graph(100, 0.120)
 
 def complete():
-    return nx.complete_graph(30)
+    return nx.complete_graph(10)
 
 def graph1():
     return nx.erdos_renyi_graph(20, 0.4)
@@ -14,3 +14,6 @@ def peterson():
 
 def diamond():
     return nx.diamond_graph()
+
+def empty():
+    return nx.empty_graph(10)
