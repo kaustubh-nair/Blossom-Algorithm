@@ -30,6 +30,7 @@ def run(g, colors, animation_data):
     while(len(free_vertices) != 0):
 
         #start with displaying the graph g 
+        update(animation_data, g, colors)
 
         free_vertices = find_free_vertices(g)
         # color all free vertices
@@ -47,14 +48,17 @@ def run(g, colors, animation_data):
 
         augmenting_path(g, random_vertex, vertices, next_free_vertex)
         # highlight the entire augmenting path
+        update(animation_data, g, colors)
 
         edges = invert_augmenting_path(g, random_vertex, vertices, next_free_vertex)
         matching.append(edges)
         # highlight the inverted augmenting path
+        update(animation_data, g, colors)
 
         g = update_graph(g, matching)
         free_vertices = find_free_vertices(g)
 
     #display final matching
+    update(animation_data, g, colors)
 
     return animation_data
