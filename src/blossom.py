@@ -1,5 +1,5 @@
 import networkx as nx
-import time
+import time, random
 
 from .helpers import update, update_vertex_color, update_edge_color
 
@@ -133,9 +133,13 @@ class Match:
 
 def find_free_vertices(g):
     free_vertices = []
+    for n, marked in g.nodes(data=True):
+        if(marked['marked'] == 0):
+            free_vertices.append(n)
     return free_vertices
 
 def pick_random(free_vertices):
+    random_vertex = random.choice(free_vertices)
     return random_vertex
 
 def BFS(g, random_vertex):
@@ -149,6 +153,10 @@ def invert_augmenting_path(g, random_vertex, vertices, next_free_vertex):
 
 def update_graph(g, matching):
     return g #To update the new matches vertices
+
+# Graph g should be initialized as follows
+# label = 0
+# nx.set_node_attributes(g, label, "marked")
 
 # Algorithm goes here
 def run(g, colors, animation_data):
