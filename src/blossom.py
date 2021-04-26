@@ -163,6 +163,7 @@ def run(g, colors, animation_data):
     matching = []
     free_vertices = find_free_vertices(g)
 
+    """
     # Example! Remove later.
     update_edge_color(colors, 1, 2, 'red')
     update_vertex_color(colors, 1, 'red')
@@ -172,6 +173,7 @@ def run(g, colors, animation_data):
     update_multiple_edge_color(colors, g.edges(), 'green')
     update(animation_data, g, colors)
 
+    """
     while(len(free_vertices) != 0):
 
         #start with displaying the graph g 
