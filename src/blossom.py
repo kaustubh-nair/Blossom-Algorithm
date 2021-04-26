@@ -154,10 +154,6 @@ def invert_augmenting_path(g, random_vertex, vertices, next_free_vertex):
 def update_graph(g, matching):
     return g #To update the new matches vertices
 
-# Graph g should be initialized as follows
-# label = 0
-# nx.set_node_attributes(g, label, "marked")
-
 # Algorithm goes here
 def run(g, colors, animation_data):
     matching = []
@@ -177,7 +173,7 @@ def run(g, colors, animation_data):
         update(animation_data, g, colors)
 
         random_vertex = pick_random(free_vertices)
-        # highlight the chosen random vertex
+        update_vertex_color(colors, random_vertex, red)
         update(animation_data, g, colors)
 
         next_free_vertex, vertices = BFS(g, random_vertex)
