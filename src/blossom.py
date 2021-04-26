@@ -178,11 +178,11 @@ def run(g, colors, animation_data):
         update(animation_data, g, colors)
 
         free_vertices = find_free_vertices(g)
-        # color all free vertices
+        update_multiple_vertex_color(colors, free_vertices, "yellow")
         update(animation_data, g, colors)
 
         random_vertex = pick_random(free_vertices)
-        update_vertex_color(colors, random_vertex, red)
+        update_vertex_color(colors, random_vertex, "red")
         update(animation_data, g, colors)
 
         next_free_vertex, vertices = BFS(g, random_vertex)
