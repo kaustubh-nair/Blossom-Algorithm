@@ -6,6 +6,9 @@ from src import blossom, sample_graphs, helpers
 
 
 g = sample_graphs.complete()
+label = 0
+nx.set_node_attributes(g, label, "marked")
+
 pos = nx.spring_layout(g)
 c = {'edges': {}, 'vertices': {}}
 

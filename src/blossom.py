@@ -1,5 +1,5 @@
 import networkx as nx
-import time
+import time, random
 
 from .helpers import (
         update, update_vertex_color, update_edge_color,
@@ -137,9 +137,13 @@ class Match:
 
 def find_free_vertices(g):
     free_vertices = []
+    for n, marked in g.nodes(data=True):
+        if(marked['marked'] == 0):
+            free_vertices.append(n)
     return free_vertices
 
 def pick_random(free_vertices):
+    random_vertex = random.choice(free_vertices)
     return random_vertex
 
 def BFS(g, random_vertex):
@@ -178,7 +182,7 @@ def run(g, colors, animation_data):
         update(animation_data, g, colors)
 
         random_vertex = pick_random(free_vertices)
-        # highlight the chosen random vertex
+        update_vertex_color(colors, random_vertex, red)
         update(animation_data, g, colors)
 
         next_free_vertex, vertices = BFS(g, random_vertex)
