@@ -7,10 +7,13 @@ from src import blossom, sample_graphs, helpers
 
 g = sample_graphs.complete()
 pos = nx.spring_layout(g)
-c = {}
+c = {'edges': {}, 'vertices': {}}
+
+for v in g.nodes():
+    c['vertices'][v] = 'blue'
 
 for edge in g.edges():
-    c[tuple(sorted(edge))] = 'grey'
+    c['edges'][tuple(sorted(edge))] = 'grey'
 
 
 animation_data = {
@@ -28,8 +31,10 @@ def press(event):
         fig.clear()
         nx.draw(graphs[index],
                 pos=pos,
-                edge_color=helpers.get_colors(animation_data['interim_colors'][index],
+                edge_color=helpers.get_edge_colors(animation_data['interim_colors'][index]['edges'],
                                               graphs[index]),
+                node_color=helpers.get_vertex_colors(animation_data['interim_colors'][index]['vertices'],
+                                                    graphs[index]),
                 width=2.0,
         )
         index += 1
@@ -40,8 +45,10 @@ fig.canvas.mpl_connect('key_press_event', press)
 fig.clear()
 nx.draw(animation_data['interim_graphs'][0],
         pos=pos,
-        edge_color=helpers.get_colors(animation_data['interim_colors'][0],
-                                      animation_data['interim_graphs'][0]),
+        edge_color=helpers.get_edge_colors(animation_data['interim_colors'][0]['edges'],
+                                           animation_data['interim_graphs'][0]),
+        node_color=helpers.get_vertex_colors(animation_data['interim_colors'][0]['vertices'],
+                                            animation_data['interim_graphs'][0]),
         width=2.0,
 )
 plt.show()

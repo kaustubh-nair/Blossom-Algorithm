@@ -1,7 +1,7 @@
 import networkx as nx
 import time
 
-from .helpers import update, update_colors
+from .helpers import update, update_vertex_color, update_edge_color
 
 
 class Node:
@@ -154,6 +154,10 @@ def update_graph(g, matching):
 def run(g, colors, animation_data):
     matching = []
     free_vertices = find_free_vertices(g)
+
+    update_edge_color(colors, 1, 2, 'red')
+    update_vertex_color(colors, 1, 'red')
+    update(animation_data, g, colors)
 
     while(len(free_vertices) != 0):
 
