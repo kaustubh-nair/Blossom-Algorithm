@@ -2,210 +2,219 @@ import networkx as nx
 import time, random
 
 from .helpers import (
-        update, update_vertex_color, update_edge_color,
-        update_multiple_vertex_color,
-        update_multiple_edge_color,
+    update, update_vertex_color, update_edge_color,
+    update_multiple_vertex_color,
+    update_multiple_edge_color,
 )
-
-
-class Node:
-
-    def __init__(self):
-        self.neighbors = []
-        self.is_visited = False
-        self.parent = None
-        self.mate = None
-        self.index = Node.index
-        Node.index += 1
-
-    def __repr__(self):
-        return str(self.index)
-
-
-class SuperNode(Node):
-
-    def __init__(self):
-        Node.__init__(self)
-        self.subnodes = []
-        self.original_edges = []
-
-    def cycle(self, node):
-        for i, v in enumerate(self.subnodes):
-            if v == node:
-                break
-
-        if (i > 0 and self.subnodes[i].mate == self.subnodes[i - 1] or i == 0 and self.subnodes[i].mate ==
-                self.subnodes[-1]):
-            return self.subnodes[i::-1] + self.subnodes[:i:-1]
-        else:
-            return self.subnodes[i::] + self.subnodes[:i]
 
 
 class Match:
 
-    def __init__(self, nodes):
-        self.nodes = nodes
-        self.unmarked_nodes = []
-        for node in nodes:
-            self.unmarked_nodes.append(node)
+    def __init__(self, g, free_vertices, colors, animation_data):
+        self.g = g
+        self.colors = colors
+        self.animation_data = animation_data
+        self.nodes = free_vertices
+        # self.unmarked_nodes = []
+        # for node in nodes:
+        #     self.unmarked_nodes.append(node)
         self.supernodes = []
 
-    # Make a super node, 2 arrays for the original edges(original_edges) and blossom edges(subnodes) are created.
-    # Necessary Manipulation are made for the neighbours of blossom
-    @staticmethod
-    def shrink_blossom(blossom):
-        snode = SuperNode()
-        for node in blossom:
-            snode.subnodes.append(node)
-            for adj_node in node.neighbors:
-                if adj_node not in blossom:
-                    snode.original_edges.append((node, adj_node))
+    def replace_head(self, node_list):
+        # assert isinstance(self.nodes[0], SuperNode)
+        su_node = node_list.pop(0)
+        for node in su_node.subnodes:
+            if node_list[0] in self.g.neighbors(node):
+                if self.g.nodes[node]["mate"] is None:
+                    node_list.insert(0, node)
+                else:
+                    for v in su_node.circle(node):
+                        node_list.insert(0, v)
 
-        for node1, node2 in snode.original_edges:
-            node1.neighbors.remove(node2)
-            node2.neighbors.remove(node1)
-            node2.neighbors.append(snode)
-            snode.neighbors.append(node2)
+                return "cannot replace head node."
 
-        return snode
+    def replace_tail(self, node_list):
+        # assert isinstance(self.nodes[-1], SuperNode)
+        su_node = node_list.pop()
+        for node in g.nodes[su_node].subnodes:
+            if node_list[-1] in self.g.neighbors(node):
+                if self.g.nodes[node]["mate"] is None:
+                    node_list.append(node)
+                else:
+                    for v in su_node.circle(node):
+                        node_list.append(v)
+                return "cannot replace tail node."
 
-    # expands the blossom with necessary manipulation on the neighbours
-    @staticmethod
-    def expand_blossom(snode):
-        for node1, node2 in snode.original_edges:
-            node1.neighbors.append(node2)
-            node2.neighbors.append(node1)
-            node2.neighbors.remove(snode)
-            snode.neighbors.remove(node2)
+    def clear_nodes(self):
+        for node in self.nodes:
+            self.g.nodes[node]["is_Visited"] = False
+            self.g.nodes[node]["parent"] = None
 
-    @staticmethod
-    def ancestors(node):
-        ancestors_list = [node]
-        while node.parent is not None:
-            node = node.parent
-            ancestors_list.append(node)
-        return ancestors_list
+    def construct_augmenting_path(self, node):
+        # self.clear_nodes()
+        node_list = [node, self.g.nodes[node]["parent"]]
+        while self.g.nodes[node]["mate"] is not None:
+            node = self.g.nodes[node]["parent"]
+            node_list.append(node)
 
-    @staticmethod
-    def find_cycles(self, node_a, node_b):
-        list_ancestor_node_a = self.ancestors(node_a)
-        list_ancestor_node_b = self.ancestors(node_b)
-        i = len(list_ancestor_node_a) - 1
-        j = len(list_ancestor_node_b) - 1
+        while len(self.supernodes) > 0:
+            su_node = self.supernodes.pop()
+            if su_node == node_list[0]:
+                self.replace_head()
+            elif su_node == node[-1]:
+                self.replace_tail()
+        print(node_list)
+        while self.g.nodes[node_list[0]]["mate"] is not None:
+            node_list.insert(self.g.node[node_list[0]]["parent"], 0)
+        print(self.g.nodes[node_list[-1]]["mate"])
+        while self.g.nodes[node_list[-1]]["mate"] is not None:
+            print(self.g.nodes[node_list[-1]]["mate"])
+            node_list.append(self.g.nodes[node_list[-1]]["parent"])
+        # aug_path_subgraph = self.g.subgraph(node_list)
 
-        while list_ancestor_node_b[i] == list_ancestor_node_b[j]:
-            i -= 1
-            j -= 1
-        return list_ancestor_node_a[:i + 1] + list_ancestor_node_b[j + 1::-1]
-
-    # def construct_augmenting_path(self, node):
+        return node_list
 
     def bfs_blossom(self, root):
         queue = [root]
-        while len(queue) != 0:
+        while len(queue) > 0:
+            print(queue)
             cur_node = queue.pop(0)
-            cur_node.is_Visited = True
-            for v in cur_node.neighbors:
-                if v.is_Visited is False and v.mate is not None:
-                    v.is_Visited = True
-                    v.mate.is_Visited = True
-                    v.parent = cur_node
-                    v.mate.parent = v
-                    queue.append(v.mate)
-                elif v.is_Visited:
-                    cycle = self.find_cycles(v, cur_node)
+            self.g.nodes[cur_node]["is_Visited"] = True
+
+            print(self.g.nodes[cur_node]["parent"])
+            if self.g.nodes[cur_node]["parent"] is not None:
+                update_edge_color(self.colors, self.g.nodes[cur_node]["parent"], cur_node, "blue")
+            update_vertex_color(self.colors, cur_node, "red")
+            update(self.animation_data, self.g, self.colors)
+            # cur_node.is_Visited = True
+            for v in [x for x in self.g.neighbors(cur_node)]:
+                if v == self.g.nodes[cur_node]["parent"]:
+                    continue
+                if self.g.nodes[v]["is_Visited"] is False and self.g.nodes[v]["mate"] is not None:
+                    self.g.nodes[v]["is_Visited"] = True
+                    self.g.nodes[self.g.nodes[v]["mate"]]["is_Visited"] = True
+                    self.g.nodes[v]["parent"] = cur_node
+                    self.g.nodes[self.g.nodes[v]["mate"]]["parent"] = v
+                    queue.append(self.g.nodes[v]["mate"])
+
+                elif self.g.nodes[v]["is_Visited"]:
+                    # cycle = self.find_cycles(v, cur_node)
+                    cycle = list(nx.find_cycle(self.g, v))
+                    blossom = self.g.subgraph(cycle)
+                    update_multiple_edge_color(self.colors, cycle, "red")
+                    update(self.animation_data, self.g, self.colors)
                     if len(cycle) % 2 != 1:
                         continue
                     else:
-                        snode = self.shrink_blossom(cycle)
-                        self.supernodes.append(snode)
-                        for node in cycle:
-                            if node in queue:
-                                queue.remove(node)
-                            if node.is_Visited:
-                                snode.is_visited = True
-                                snode.parent = node.parent
-                        queue.append(snode)
+                        su_node = nx.Graph.nodes
+                        subnodes = []
+                        original_edges = []
+                        su_node_attr = {su_node: {"is_Visited": False, "mate": None, "parent": None,
+                                                  "subnodes": subnodes, "original_edges": original_edges}}
+
+                        self.g.add_node(su_node)
+                        nx.set_node_attributes(self.g, su_node_attr)
+
+                        for n in blossom.nodes:
+                            self.g.nodes[su_node]["subnodes"].append(n)
+                            nbrs = set(self.g.neighbors(n))
+                            queue.remove(n)
+                            if self.g.nodes[n]["is_Visited"]:
+                                self.g.nodes[su_node]["is_Visited "] = True
+                                self.g.nodes[su_node]["parent"] = self.g.nodes[n]["parent"]
+                            for nbr in nbrs - {blossom.nodes}:
+                                self.g.add_edge(su_node, nbr)
+                                update_edge_color(self.colors, su_node, nbr, "black")
+                            self.g.remove_node(n)
+                        print("su")
+                        print(self.g.nodes[su_node]["parent"])
+                        update_vertex_color(self.colors, su_node, "black")
+                        update(self.animation_data, self.g, self.colors)
+                        self.supernodes.append(su_node)
+                        queue.append(su_node)
                         break
                 else:
-                    if v.mate is None:
-                        v.parent = cur_node
-                        return self.construct_augmenting_path(v)
+                    if self.g.nodes[v]["mate"] is None:
+                        self.g.nodes[v]["parent"] = cur_node
+                        print(self.g.nodes[v]["parent"], "v")
+                        node_list = self.construct_augmenting_path(v)
+                        aug_path_subgraph = self.g.subgraph(node_list)
+                        return aug_path_subgraph
 
-
+    def invert_aug_path(self, aug_path):
+        assert len(aug_path.nodes) % 2 == 0
+        inv_aug_path = list(aug_path.nodes)
+        inv_aug_path_edge = []
+        for i in range(0, len(inv_aug_path), 2):
+            self.g.nodes[i]["mate"] = self.g.nodes[i + 1]
+            self.g.nodes[i + 1]["mate"] = self.g.nodes[i]
+            inv_aug_path_edge.append([i, i + 1])
+        return inv_aug_path_edge
 
 
 def find_free_vertices(g):
     free_vertices = []
-    for n, marked in g.nodes(data=True):
-        if(marked['marked'] == 0):
+    for n in g.nodes():
+        if g.nodes[n]["mate"] is None:
             free_vertices.append(n)
     return free_vertices
 
+
 def pick_random(free_vertices):
     random_vertex = random.choice(free_vertices)
+    # print(random_vertex)
     return random_vertex
 
-def BFS(g, random_vertex):
-    return next_free_vertex, vertices #all the vertices in between the random vertex and the final free vertex
-
-def augmenting_path(g, random_vertex, vertices, next_free_vertex):
-    return
-
-def invert_augmenting_path(g, random_vertex, vertices, next_free_vertex):
-    return edges
-
-def update_graph(g, matching):
-    return g #To update the new matches vertices
 
 # Algorithm goes here
 def run(g, colors, animation_data):
-    matching = []
+    # max_matching = []
     free_vertices = find_free_vertices(g)
 
-    """
-    # Example! Remove later.
-    update_edge_color(colors, 1, 2, 'red')
-    update_vertex_color(colors, 1, 'red')
-    update(animation_data, g, colors)
-
-    update_multiple_vertex_color(colors, g.nodes(), 'green')
-    update_multiple_edge_color(colors, g.edges(), 'green')
-    update(animation_data, g, colors)
-
-    """
-    while(len(free_vertices) != 0):
-
-        #start with displaying the graph g 
+    matching = Match(g, free_vertices, colors, animation_data)
+    while len(free_vertices) != 0:
+        # start with displaying the graph g
         update(animation_data, g, colors)
 
         free_vertices = find_free_vertices(g)
         update_multiple_vertex_color(colors, free_vertices, "yellow")
         update(animation_data, g, colors)
 
-        random_vertex = pick_random(free_vertices)
-        update_vertex_color(colors, random_vertex, "red")
-        update(animation_data, g, colors)
-
-        next_free_vertex, vertices = BFS(g, random_vertex)
+        # random_vertex = pick_random(free_vertices)
+        for node in free_vertices:
+            update_vertex_color(colors, node, "red")
+            update(animation_data, g, colors)
+            aug_path = matching.bfs_blossom(node)
+            update_multiple_edge_color(colors, aug_path.edges, "red")
+            path = [x for x in aug_path.nodes]
+            print(path)
+            # free_vertices.remove(path[0])
+            # free_vertices.remove(path[-1])
+            break
+        else:
+            print("No more augmenting paths found")
+            break
+        # next_free_vertex, vertices = BFS(g, random_vertex)
         # highlight the next free vertex
         # this step can be further subdivided -- showing all animations till finding the next free vertex
         # also add the blossom part in this
         update(animation_data, g, colors)
+        #
+        max_matching = matching.invert_aug_path(aug_path)
+        update_multiple_edge_color(colors, max_matching, "blue")
+        count = 0
+        for node in free_vertices:
+            if g.nodes[node]["mate"] is not None:
+                count += 1
 
-        augmenting_path(g, random_vertex, vertices, next_free_vertex)
-        # highlight the entire augmenting path
-        update(animation_data, g, colors)
-
-        edges = invert_augmenting_path(g, random_vertex, vertices, next_free_vertex)
-        matching.append(edges)
+        print(len(free_vertices) - count)
         # highlight the inverted augmenting path
         update(animation_data, g, colors)
+        #
+        # g = update_graph(g, matching)
+        # free_vertices = find_free_vertices(g)
 
-        g = update_graph(g, matching)
-        free_vertices = find_free_vertices(g)
+    # display final matching
 
-    #display final matching
     update(animation_data, g, colors)
-
     return animation_data

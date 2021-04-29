@@ -4,12 +4,13 @@ import matplotlib.pyplot as plt
 
 from src import blossom, sample_graphs, helpers
 
-
 g = sample_graphs.complete()
-label = 0
-nx.set_node_attributes(g, label, "marked")
+
+attributes_dict = {n: {"is_Visited": False, "mate": None, "parent": None} for n in g.nodes()}
+nx.set_node_attributes(g, attributes_dict)
 
 pos = nx.spring_layout(g)
+
 c = {'edges': {}, 'vertices': {}}
 
 for v in g.nodes():
@@ -18,15 +19,15 @@ for v in g.nodes():
 for edge in g.edges():
     c['edges'][tuple(sorted(edge))] = 'grey'
 
-
 animation_data = {
-            'interim_graphs': [g.copy()],
-            'interim_colors': [deepcopy(c)],
-    }
+    'interim_graphs': [g.copy()],
+    'interim_colors': [deepcopy(c)],
+}
 blossom.run(g, c, animation_data)
 
-
 index = 1
+
+
 def press(event):
     global index
     graphs = animation_data['interim_graphs']
@@ -35,13 +36,14 @@ def press(event):
         nx.draw(graphs[index],
                 pos=pos,
                 edge_color=helpers.get_edge_colors(animation_data['interim_colors'][index]['edges'],
-                                              graphs[index]),
+                                                   graphs[index]),
                 node_color=helpers.get_vertex_colors(animation_data['interim_colors'][index]['vertices'],
-                                                    graphs[index]),
+                                                     graphs[index]),
                 width=2.0,
-        )
+                )
         index += 1
         fig.canvas.draw()
+
 
 fig, ax = plt.subplots()
 fig.canvas.mpl_connect('key_press_event', press)
@@ -51,7 +53,7 @@ nx.draw(animation_data['interim_graphs'][0],
         edge_color=helpers.get_edge_colors(animation_data['interim_colors'][0]['edges'],
                                            animation_data['interim_graphs'][0]),
         node_color=helpers.get_vertex_colors(animation_data['interim_colors'][0]['vertices'],
-                                            animation_data['interim_graphs'][0]),
+                                             animation_data['interim_graphs'][0]),
         width=2.0,
-)
+        )
 plt.show()

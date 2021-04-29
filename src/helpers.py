@@ -17,7 +17,7 @@ def update_vertex_color(colors, u, color):
     colors['vertices'][u] = color
 
 def update_multiple_edge_color(colors, edges, color):
-    for u,v in edges:
+    for u, v in edges:
         colors['edges'][tuple(sorted([u, v]))] = color
 
 def update_multiple_vertex_color(colors, verts, color):
