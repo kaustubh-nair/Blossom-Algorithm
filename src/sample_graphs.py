@@ -19,4 +19,4 @@ def empty():
     return nx.empty_graph(10)
 
 def path():
-    return nx.path_graph(10)
+    return nx.path_graph(8)
