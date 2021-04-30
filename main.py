@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 
 from src import blossom, sample_graphs, helpers
 
-g = sample_graphs.complete()
+g = sample_graphs.path()
+print(g.edges())
 
 attributes_dict = {n: {"is_Visited": False, "mate": None, "parent": None} for n in g.nodes()}
 nx.set_node_attributes(g, attributes_dict)

@@ -63,12 +63,9 @@ class Match:
                 self.replace_head()
             elif su_node == node[-1]:
                 self.replace_tail()
-        print(node_list)
         while self.g.nodes[node_list[0]]["mate"] is not None:
             node_list.insert(self.g.node[node_list[0]]["parent"], 0)
-        print(self.g.nodes[node_list[-1]]["mate"])
         while self.g.nodes[node_list[-1]]["mate"] is not None:
-            print(self.g.nodes[node_list[-1]]["mate"])
             node_list.append(self.g.nodes[node_list[-1]]["parent"])
         # aug_path_subgraph = self.g.subgraph(node_list)
 
@@ -77,17 +74,17 @@ class Match:
     def bfs_blossom(self, root):
         queue = [root]
         while len(queue) > 0:
-            print(queue)
             cur_node = queue.pop(0)
             self.g.nodes[cur_node]["is_Visited"] = True
 
-            print(self.g.nodes[cur_node]["parent"])
             if self.g.nodes[cur_node]["parent"] is not None:
                 update_edge_color(self.colors, self.g.nodes[cur_node]["parent"], cur_node, "blue")
             update_vertex_color(self.colors, cur_node, "red")
             update(self.animation_data, self.g, self.colors)
             # cur_node.is_Visited = True
             for v in [x for x in self.g.neighbors(cur_node)]:
+                print(cur_node)
+                print([x for x in self.g.neighbors(cur_node)])
                 if v == self.g.nodes[cur_node]["parent"]:
                     continue
                 if self.g.nodes[v]["is_Visited"] is False and self.g.nodes[v]["mate"] is not None:
@@ -99,14 +96,18 @@ class Match:
 
                 elif self.g.nodes[v]["is_Visited"]:
                     # cycle = self.find_cycles(v, cur_node)
-                    cycle = list(nx.find_cycle(self.g, v))
+                    try:
+                        cycle = list(nx.find_cycle(self.g, v))
+                    except Exception as e:
+                        print("NO CYCLE FOUND!!!")
+                        break
                     blossom = self.g.subgraph(cycle)
                     update_multiple_edge_color(self.colors, cycle, "red")
                     update(self.animation_data, self.g, self.colors)
                     if len(cycle) % 2 != 1:
                         continue
                     else:
-                        su_node = nx.Graph.nodes
+                        su_node = max(self.g.nodes) + 1
                         subnodes = []
                         original_edges = []
                         su_node_attr = {su_node: {"is_Visited": False, "mate": None, "parent": None,
@@ -126,8 +127,6 @@ class Match:
                                 self.g.add_edge(su_node, nbr)
                                 update_edge_color(self.colors, su_node, nbr, "black")
                             self.g.remove_node(n)
-                        print("su")
-                        print(self.g.nodes[su_node]["parent"])
                         update_vertex_color(self.colors, su_node, "black")
                         update(self.animation_data, self.g, self.colors)
                         self.supernodes.append(su_node)
@@ -136,7 +135,6 @@ class Match:
                 else:
                     if self.g.nodes[v]["mate"] is None:
                         self.g.nodes[v]["parent"] = cur_node
-                        print(self.g.nodes[v]["parent"], "v")
                         node_list = self.construct_augmenting_path(v)
                         aug_path_subgraph = self.g.subgraph(node_list)
                         return aug_path_subgraph
@@ -146,8 +144,8 @@ class Match:
         inv_aug_path = list(aug_path.nodes)
         inv_aug_path_edge = []
         for i in range(0, len(inv_aug_path), 2):
-            self.g.nodes[i]["mate"] = self.g.nodes[i + 1]
-            self.g.nodes[i + 1]["mate"] = self.g.nodes[i]
+            self.g.nodes[i]["mate"] = i+1
+            self.g.nodes[i + 1]["mate"] = i
             inv_aug_path_edge.append([i, i + 1])
         return inv_aug_path_edge
 
@@ -162,7 +160,6 @@ def find_free_vertices(g):
 
 def pick_random(free_vertices):
     random_vertex = random.choice(free_vertices)
-    # print(random_vertex)
     return random_vertex
 
 
@@ -187,12 +184,10 @@ def run(g, colors, animation_data):
             aug_path = matching.bfs_blossom(node)
             update_multiple_edge_color(colors, aug_path.edges, "red")
             path = [x for x in aug_path.nodes]
-            print(path)
             # free_vertices.remove(path[0])
             # free_vertices.remove(path[-1])
             break
         else:
-            print("No more augmenting paths found")
             break
         # next_free_vertex, vertices = BFS(g, random_vertex)
         # highlight the next free vertex
@@ -207,7 +202,6 @@ def run(g, colors, animation_data):
             if g.nodes[node]["mate"] is not None:
                 count += 1
 
-        print(len(free_vertices) - count)
         # highlight the inverted augmenting path
         update(animation_data, g, colors)
         #
