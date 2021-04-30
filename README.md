@@ -6,7 +6,7 @@ Implementation and Visualization of the Blossom algorithm to construct a maximum
 Make sure you're running python 3.6.x
 
 ```
-pip install -r requirements.txt
+$ pip install -r requirements.txt
 ```
 
 ## Algorithm
@@ -14,7 +14,7 @@ pip install -r requirements.txt
 To run the algorithm, in your terminal, enter
 
 ```
-$python main.py
+$ python main.py
 ```
 
 Press `enter` to update graph.
