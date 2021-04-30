@@ -49,7 +49,21 @@ def find_next_free_node(g, bfs_arr):
             if g.nodes[index1]["matched"] is False:
                 g.nodes[index1]["matched"] = True
                 return [None], index1
-
+            
+def blossom(g, index0, vertices, index2):
+    g.nodes[index0]["blossom"] = True
+    g.nodes[index2]["blossom"] = True
+    for vertex in vertices:
+        index = get_index(g, vertex)
+        g.nodes[index]["blossom"] = True
+    node_list = []
+    for node in g.nodes():
+        index = get_index(g, node)
+        if g.nodes[index]["blossom"] == False :
+            node_list.append(index)
+    node_list.append(index0) #Node subsuming blossom
+    g_new = g.subgraph(node_list)
+    return g_new
 
 def get_aug_path(g, random_vertex, next_free_node):
     index1 = get_index(g, random_vertex)

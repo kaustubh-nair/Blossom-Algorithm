@@ -6,7 +6,7 @@ from src import blossom, sample_graphs, helpers
 
 g = sample_graphs.path()
 
-attributes_dict = {n: {"visited": False, "matched": False} for n in g.nodes()}
+attributes_dict = {n: {"blossom": False, "matched": False} for n in g.nodes()}
 nx.set_node_attributes(g, attributes_dict)
 
 pos = nx.spring_layout(g)
