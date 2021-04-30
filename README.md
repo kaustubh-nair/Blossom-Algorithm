@@ -9,7 +9,7 @@ Make sure you're running python 3.6.x
 pip install -r requirements.txt
 ```
 
-## ALgorithm
+## Algorithm
 
 To run the algorithm, in your terminal, enter
 
