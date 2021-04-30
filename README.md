@@ -1,6 +1,13 @@
 # Blossom Algorithm
 
-Implementation and animation of the Blossom algorithm to construct a maximum matching in any graph. The blossom algorithm is a polynomial time maximum graph matching algorithm that has a complexity `O(|V|x|E<sup>2</sup>|)`. We have used [NetworkX](https://networkx.org/) along with [Matplotlib](https://matplotlib.org/) to maintain and visualize the graph. The animation is interactive and the steps of the algorithm can be viewed one-by-one by pressing the `enter` key while the program is executing. A video of the algorithm can be viewed in the `video/` folder.
+Implementation and animation of the Blossom algorithm to construct a maximum matching in any graph. The blossom algorithm is a polynomial time maximum graph matching algorithm that has a complexity O(|V|x|E<sup>2</sup>|). We have used [NetworkX](https://networkx.org/) along with [Matplotlib](https://matplotlib.org/) to maintain and visualize the graph. The animation is interactive and the steps of the algorithm can be viewed one-by-one by pressing the `enter` key while the program is executing. A video of the algorithm can be viewed in the `video/` folder.
+
+## Team members
+
+1. Bishal Pandia IMT2017010
+2. Kaustubh Nair IMT2017025
+3. Sarthak Khoche IMT2017038
+
 
 ## Prerequisites and Setup 
 Make sure your Python version is 3.6.x
@@ -20,8 +27,15 @@ $ python main.py
 
 Press the `enter` key to update graph and view the next step in the algorithm.
 
+## Animations
+Here are some animations of the algorithm:
 
-## Algorithm
+<img src="/video/complete.gif?raw=true" >
+
+<img src="/video/path.gif?raw=true" >
+
+<img src="/video/blossom.gif?raw=true" >
+
 
 ## Brief about the code
 Here is an overview about the files related to the implementation:

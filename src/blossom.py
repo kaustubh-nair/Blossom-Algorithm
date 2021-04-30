@@ -90,7 +90,6 @@ def run(g, colors, animation_data):
 
         bfs_arr = bfs(g, random_vertex)
         ret = find_next_free_node(g, bfs_arr)
-        print("DEBUG", ret)
         _, next_free_node = ret
         update_vertex_color(colors, next_free_node, "red")
         update(animation_data, g, colors)
@@ -110,10 +109,6 @@ def run(g, colors, animation_data):
         max_matching.append(invert_aug_path.edges())
         free_vertices = find_free_vertices(g)
 
-    update_multiple_vertex_color(colors, g.nodes(), "black")
-    update_multiple_edge_color(colors, g.edges(), "blue")
-    for i in range(len(max_matching)):
-        update_multiple_edge_color(colors, max_matching[i], "red")
     update(animation_data, g, colors)
     # Red is the color of final augmenting path
 

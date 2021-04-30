@@ -1,3 +1,4 @@
+import numpy as np
 from copy import deepcopy
 
 def get_vertex_colors(c, g):
@@ -23,3 +24,8 @@ def update_multiple_edge_color(colors, edges, color):
 def update_multiple_vertex_color(colors, verts, color):
     for u in verts:
         colors['vertices'][u] = color
+
+def get_index(g, value):
+    nodes_list = np.array(list(g.nodes()))
+    index = np.where(nodes_list == value)[0][0]
+    return index

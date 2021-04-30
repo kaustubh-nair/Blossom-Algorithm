@@ -3,9 +3,6 @@ import networkx as nx
 def random():
     return nx.random_geometric_graph(100, 0.120)
 
-def complete():
-    return nx.complete_graph(10)
-
 def graph1():
     return nx.erdos_renyi_graph(20, 0.4)
 
@@ -19,4 +16,4 @@ def empty():
     return nx.empty_graph(10)
 
 def path():
-    return nx.path_graph(10)
+    return nx.path_graph(8)
