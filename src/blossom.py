@@ -41,7 +41,15 @@ def find_next_free_node(g, bfs_arr):
         index = get_index(g, bfs_arr[i])
         if g.nodes[index]["matched"] is False:
             g.nodes[index]["matched"] = True
-            return index
+            return [None], index
+
+        if g.nodes[index]["matched"] is True:
+            # Add its other matched vertex
+            index1 = get_index(g, bfs_arr[i+1])
+            if g.nodes[index1]["matched"] is False:
+                g.nodes[index1]["matched"] = True
+                return [None], index1
+
 
 def get_aug_path(g, random_vertex, next_free_node):
     index1 = get_index(g, random_vertex)
@@ -67,7 +75,7 @@ def run(g, colors, animation_data):
     max_matching = []
     free_vertices = find_free_vertices(g)
 
-    while len(free_vertices) > 1:
+    while len(free_vertices) > 0:
         update_multiple_vertex_color(colors, g.nodes(), "blue")
         free_vertices = find_free_vertices(g)
         update_multiple_vertex_color(colors, free_vertices, "yellow")
@@ -81,7 +89,7 @@ def run(g, colors, animation_data):
         # Red is the color of randomly chosen vertex among free vertices
 
         bfs_arr = bfs(g, random_vertex)
-        next_free_node = find_next_free_node(g, bfs_arr)
+        _, next_free_node = find_next_free_node(g, bfs_arr)
         update_vertex_color(colors, next_free_node, "red")
         update(animation_data, g, colors)
         # Red is also the color of next unmatched vertex closest to random vertex
@@ -99,9 +107,11 @@ def run(g, colors, animation_data):
         update_nodes(g, invert_aug_path)
         max_matching.append(invert_aug_path.edges())
         free_vertices = find_free_vertices(g)
-        # print(free_vertices)
 
-    update(animation_data, g, colors)
-    update_multiple_edge_color(colors, max_matching[0], "blue")
-    # Blue is the color of final augmenting path
+    for i in range(len(max_matching)):
+        update_multiple_vertex_color(colors, g.nodes(), "green")
+        update_multiple_edge_color(colors, max_matching[i], "blue")
+        update(animation_data, g, colors)
+        # Blue is the color of final augmenting path
+
     return animation_data
